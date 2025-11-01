@@ -1,5 +1,7 @@
 # Práctica 4 - Detección de Matrículas con YOLO
 
+Práctica realizada por el grupo 15 (Lucía Motas Guedes y Raúl Marrero Marichal).
+
 Este proyecto implementa un **sistema de detección y seguimiento de personas y vehículos** mediante **YOLOv8/YOLO11** y el framework **Ultralytics**, con capacidad para:
 - Detectar y seguir vehículos y personas en vídeo.  
 - Detectar matrículas en vehículos mediante un modelo entrenado propio.  
@@ -9,7 +11,7 @@ Este proyecto implementa un **sistema de detección y seguimiento de personas y 
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```bash
 ├── dataset/
@@ -30,21 +32,22 @@ Este proyecto implementa un **sistema de detección y seguimiento de personas y 
 │ └── best.pt
 ├── VC_P4.ipynb # Cuaderno con la resolución de la primera parte de la práctica
 ├── VC_P4b.ipynb # Cuaderno con la resolución de la segunda parte (OCR)
-├── C0142.mp4 # Vídeo de test (no incluido por tamaño)
+├── C0142.mp4 # Vídeo de test (enlace externo)
 ├── p4_output.mp4 # Vídeo resultante con detecciones (enlace externo)
 ├── p4_results.csv # Resultados de detección y tracking
 ├── p4_flujo.csv # Resultados del flujo final
 └── README.md
 ```
+> Nota: Los vídeos no han sido incluidos en el repositorio porque superan el tamaño permitido y el dataset se encuentra disponible en google drive.
 
 ---
 
-## ⚙️ 1. Configuración del Entorno
+## 1. Configuración del Entorno
 
 Requiere un entorno Python con soporte CUDA (En nuestro caso: CUDA 12.7).
 
 * Instalar Python 3.9.5.
-* Ejecutar los siguientes comandos en una terminal, con permisos de administrador
+* Ejecutar los siguientes comandos en una terminal, con permisos de administrador.
 
 ### Instalación paso a paso
 
@@ -70,7 +73,7 @@ pip install lap
 
 ---
 
-## Entrenamiento del Modelo para Detectar Matrículas
+## 2. Entrenamiento del Modelo para Detectar Matrículas
 
 Una vez recopiladas y anotadas las imágenes, se deben organizar correctamente antes del entrenamiento con YOLO.
 
@@ -82,8 +85,8 @@ dataset/
 └── labels/
 ```
 
-* `images/`: contiene las imágenes de entrada
-* `labels/`: contiene los archivos `.txt` homónimos con las anotaciones
+* `images/`: contiene las imágenes de entrada.
+* `labels/`: contiene los archivos `.txt` homónimos con las anotaciones.
 
 Cada archivo `.txt` contiene las anotaciones en formato YOLO:
 
@@ -95,15 +98,15 @@ Donde:
 
 | Campo             | Descripción                                                        |
 | ----------------- | ------------------------------------------------------------------ |
-| `object-class-id` | Identificador numérico de la clase (por ejemplo, `0` para “plate”) |
-| `x`, `y`          | Coordenadas del **centro del contenedor**, normalizadas            |
-| `width`, `height` | Dimensiones del contenedor, también normalizadas                   |
+| `object-class-id` | Identificador numérico de la clase (por ejemplo, `0` para “plate”). |
+| `x`, `y`          | Coordenadas del **centro del contenedor**, normalizadas.            |
+| `width`, `height` | Dimensiones del contenedor, también normalizadas.                   |
 
 ---
 
-### División del dataset
+### División del dataset (([Enlace al repositorio](https://drive.google.com/drive/folders/1FaHHGn4XlpjYOFe-2kCk8cHs3wnOyZk6)
 
-Se realizó una división aleatoria mediante el script `divide.py`:
+Se disponía de 691 imágenes y se realizó una división aleatoria mediante el script `divide.py`:
 
 | Conjunto      | Porcentaje | Nº de imágenes |
 | ------------- | ---------- | -------------- |
@@ -154,7 +157,7 @@ yolo detect predict model=yolo_runs/plates_detection/weights/best.pt source="C01
 ```
 
 
-## Detección, Seguimiento y Anonimización (`p4.py`)
+## 3. Detección, Seguimiento y Anonimización (`p4.py`)
 
 El script `p4.py` realiza todo el pipeline de detección y seguimiento.
 
@@ -186,7 +189,7 @@ Si no detecta matrícula:
 
 ---
 
-## Análisis del Flujo Direccional (`p4_flujo.py`)
+## 4. Análisis del Flujo Direccional (`p4_flujo.py`)
 
 El flujo direccional no se calcula durante la inferencia, sino **a partir del CSV generado**.
 
@@ -208,14 +211,6 @@ El flujo direccional no se calcula durante la inferencia, sino **a partir del CS
 
 ---
 
-### ▶️ Ejecución
-
-```bash
-python p4_flujo.py
-```
-
----
-
 ### Formato del CSV
 
 | track_id | tipo_objeto | confianza | flujo     |
@@ -226,15 +221,15 @@ python p4_flujo.py
 
 ---
 
-## Videos
+## 5. Videos
 
 ### Video de test
 ([Enlace al video](https://alumnosulpgc-my.sharepoint.com/personal/mcastrillon_iusiani_ulpgc_es/_layouts/15/stream.aspx?id=%2Fpersonal%2Fmcastrillon%5Fiusiani%5Fulpgc%5Fes%2FDocuments%2FRecordings%2FC0142%2EMP4&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E46ab14ca%2D810e%2D4502%2Db4e6%2D24d9e9c97e7e))
 
 ### Video procesado (Anonimización)
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=X" target="_blank">
-    <img src="https://img.youtube.com/vi/X/0.jpg" alt="Video anonimización" width="480">
+  <a href="https://www.youtube.com/watch?v=367ghZkLyX0" target="_blank">
+    <img src="https://img.youtube.com/vi/367ghZkLyX0/0.jpg" alt="Video anonimización" width="480">
   </a>
 </p>
 
