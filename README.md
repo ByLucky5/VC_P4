@@ -1,4 +1,4 @@
-# Práctica 4 - Entrenamiento de un modelo para Detección de Matrículas con YOLO
+# Práctica 4 - Detección de Matrículas con YOLO
 
 Este proyecto implementa un **sistema de detección y seguimiento de personas y vehículos** mediante **YOLOv8/YOLO11** y el framework **Ultralytics**, con capacidad para:
 - Detectar y seguir vehículos y personas en vídeo.  
@@ -11,6 +11,7 @@ Este proyecto implementa un **sistema de detección y seguimiento de personas y 
 
 ## 📁 Estructura del Proyecto
 
+```bash
 ├── dataset/
 │ ├── train/
 │ │ ├── images/
@@ -34,6 +35,7 @@ Este proyecto implementa un **sistema de detección y seguimiento de personas y 
 ├── p4_results.csv # Resultados de detección y tracking
 ├── p4_flujo.csv # Resultados del flujo final
 └── README.md
+```
 
 ---
 
