@@ -35,9 +35,6 @@ Este proyecto implementa un **sistema de detección y seguimiento de personas y 
 ├── C0142.mp4 # Vídeo de test (enlace externo)
 ├── p4_output.mp4 # Vídeo resultante con detecciones (enlace externo)
 ├── p4_results.csv # Resultados de detección y tracking
-├── p4_conteo_clases.csv # Conteo de clases por track_id
-├── p4_flujo.csv # Resultados del flujo final
-├── p4_conteo_flujo.csv # Análisis del flujo
 └── README.md
 ```
 > Nota: Los vídeos no han sido incluidos en el repositorio porque superan el tamaño permitido y el dataset se encuentra disponible en google drive.
@@ -159,7 +156,7 @@ yolo detect predict model=yolo_runs/plates_detection/weights/best.pt source="C01
 ```
 
 
-## 3. Detección, Seguimiento y Anonimización (`p4.py`)
+## 3. Detección, Seguimiento y Anonimización
 
 El script `p4.py` realiza todo el pipeline de detección y seguimiento.
 
@@ -194,38 +191,74 @@ Si no detecta matrícula:
 
 ---
 
-## 4. Análisis del Flujo Direccional (`p4_flujo.py`)
+## 4. Análisis del Flujo Direccional
 
-El flujo direccional no se calcula durante la inferencia, sino **a partir del CSV generado**.
+El análisis del **flujo vertical (arriba / abajo)** se realiza en tiempo real durante la inferencia, usando el **tracking persistente de YOLO**.
+Cada entidad detectada mantiene un `track_id` único que permite conocer su trayectoria a lo largo de los fotogramas.
 
-### 📋 Proceso
+---
 
-1. Se lee el archivo `p4_results.csv`.
-2. Se calcula el **centro de cada detección**:
+### Lógica del proceso
+
+1. **Cálculo del centro del objeto**
+   Para cada detección válida (persona o vehículo), se calcula el centro del contenedor:
 
    ```python
    cy = (y1 + y2) // 2
    ```
-3. Se registra el primer y último centro de cada `track_id`.
-4. Se determina la dirección del movimiento:
 
-   * ⬆️ **arriba** si `cy_final < cy_inicial`
-   * ⬇️ **abajo** si `cy_final > cy_inicial`
-   * ⏹️ **estática** si no hay desplazamiento significativo
-5. Se genera un **CSV resumen final**: `p4_flujo.csv`
+   Este punto representa la posición media del objeto en el frame.
+
+2. **Registro histórico del movimiento**
+   Se almacena la secuencia de centros por `track_id`:
+
+   ```python
+   track_history[track_id].append((cx, cy))
+   ```
+
+   Así se puede conocer el desplazamiento vertical (cy) de cada entidad a lo largo del vídeo.
+
+3. **Determinación de dirección de flujo**
+   Una vez que un objeto **desaparece del frame** (ya no está presente en `current_ids`), se compara su posición inicial y final:
+
+   ```python
+   cy_first = track_history[track_id][0][1]
+   cy_last  = track_history[track_id][-1][1]
+   ```
+
+   Y se evalúa el sentido de movimiento:
+
+   * ⬆️ **Arriba** → `cy_last < cy_first`
+   * ⬇️ **Abajo** → `cy_last > cy_first`
+   * ⏹️ **Estático** → desplazamiento menor que un umbral (movimiento mínimo o ruido)
+
+---
+
+### Umbrales de salida
+
+Para evitar falsos positivos cuando un objeto aún está dentro del área visible, se definen **zonas de salida** en la parte superior e inferior del vídeo:
+
+```python
+top_exit_threshold = int(height * 0.05)
+bot_exit_threshold = height - top_exit_threshold
+```
+
+Si el centro vertical (`cy`) de un objeto cruza uno de estos umbrales, se interpreta como **salida del frame**:
+
+```python
+if centers[-1][1] <= top_exit_threshold:
+    direction = "arriba"
+elif centers[-1][1] >= bot_exit_threshold:
+    direction = "abajo"
+```
+
+Esto garantiza que solo se contabilizan los objetos que realmente **salen** del vídeo por alguno de los bordes.
+Durante la ejecución, los conteos se muestran **frame a frame** superpuestos sobre el vídeo, y al finalizar se dispone del **conteo total acumulado por clase y dirección**.
 
 > Nota: cy representa el centro vertical del objeto en el frame.
 > Como la cámara está fija y la escena principal tiene movimiento de personas y vehículos subiendo o bajando en la imagen, interesa el desplazamiento vertical, no horizontal.
 > Esto permite decir si un objeto “entra” desde abajo o “sale” hacia arriba del frame.
 > cx sería útil solo si se quisiera flujo horizontal (por ejemplo, tráfico de calles de lado).
-
----
-
-### Formato del CSV
-
-| frame | tipo_objeto | confianza | track_id | x1 | y1 | x2 | y2 | plate | plate_conf | mx1 | my1 | mx2 | my2 | flujo |
-| ----- | ----------- | --------- | -------- | -- | -- | -- | -- | ----- | ---------- | --- | --- | --- | --- | ----- |
-| 12    | car         | 0.91      | 1        | 138 | 220 | 248 | 345 | Si    | 0.87       | 145 | 230 | 240 | 340 | arriba |
 
 ---
 
@@ -236,8 +269,8 @@ El flujo direccional no se calcula durante la inferencia, sino **a partir del CS
 
 ### Video procesado (Anonimización)
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=367ghZkLyX0" target="_blank">
-    <img src="https://img.youtube.com/vi/367ghZkLyX0/0.jpg" alt="Video anonimización" width="480">
+  <a href="https://www.youtube.com/watch?v=66cw3o4lElE" target="_blank">
+    <img src="https://img.youtube.com/vi/66cw3o4lElE/0.jpg" alt="Video anonimización" width="480">
   </a>
 </p>
 
