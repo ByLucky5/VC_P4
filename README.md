@@ -7,7 +7,7 @@ Este proyecto implementa un **sistema de detección y seguimiento de personas y 
 - Detectar matrículas en vehículos mediante un modelo entrenado propio.  
 - Anonimizar personas y matrículas en la visualización final.  
 - Generar un **CSV con los resultados** de detección y seguimiento.  
-- Calcular el **flujo direccional** (izquierda/derecha) de personas y vehículos.
+- Calcular el **flujo direccional** (arriba/abajo) de personas y vehículos.
 
 ---
 
@@ -35,7 +35,9 @@ Este proyecto implementa un **sistema de detección y seguimiento de personas y 
 ├── C0142.mp4 # Vídeo de test (enlace externo)
 ├── p4_output.mp4 # Vídeo resultante con detecciones (enlace externo)
 ├── p4_results.csv # Resultados de detección y tracking
+├── p4_conteo_clases.csv # Conteo de clases por track_id
 ├── p4_flujo.csv # Resultados del flujo final
+├── p4_conteo_flujo.csv # Análisis del flujo
 └── README.md
 ```
 > Nota: Los vídeos no han sido incluidos en el repositorio porque superan el tamaño permitido y el dataset se encuentra disponible en google drive.
@@ -188,7 +190,7 @@ Si no detecta matrícula:
 | ----- | ----------- | --------- | -------- | -- | --- | --- | --- | ----- | ---------- | --- | --- | --- | --- |
 | 27    | person      | 0.78      | 5        | 56 | 234 | 134 | 346 | No    | ,          | ,   | ,   | ,   | ,   |
 
-- Genera un CSV con el **conteo de objetos únicos** (`p4_conteo_clases.csv`) para evitar contar varias veces el mismo vehículo o persona.
+- Luego se genera un CSV con el **conteo de objetos** (`p4_conteo_clases.csv`), sin repeticiones por track_id, para evitar contar varias veces el mismo vehículo o persona.
 
 ---
 
@@ -202,7 +204,7 @@ El flujo direccional no se calcula durante la inferencia, sino **a partir del CS
 2. Se calcula el **centro de cada detección**:
 
    ```python
-   cx = (x1 + x2) // 2
+   cy = (y1 + y2) // 2
    ```
 3. Se registra el primer y último centro de cada `track_id`.
 4. Se determina la dirección del movimiento:
@@ -211,6 +213,11 @@ El flujo direccional no se calcula durante la inferencia, sino **a partir del CS
    * ⬇️ **abajo** si `cy_final > cy_inicial`
    * ⏹️ **estática** si no hay desplazamiento significativo
 5. Se genera un **CSV resumen final**: `p4_flujo.csv`
+
+> Nota: cy representa el centro vertical del objeto en el frame.
+> Como la cámara está fija y la escena principal tiene movimiento de personas y vehículos subiendo o bajando en la imagen, interesa el desplazamiento vertical, no horizontal.
+> Esto permite decir si un objeto “entra” desde abajo o “sale” hacia arriba del frame.
+> cx sería útil solo si se quisiera flujo horizontal (por ejemplo, tráfico de calles de lado).
 
 ---
 
