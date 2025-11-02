@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 
 # === CONFIGURACIÓN ===
-DATASET_DIR = Path(".")  # Ejecutar dentro de yolo/
+DATASET_DIR = Path(".")  # Ejecutar dentro del dataset/
 IMAGES_DIR = DATASET_DIR / "images"
 LABELS_DIR = DATASET_DIR / "labels"
 
@@ -36,7 +36,7 @@ else:
 # Filtramos solo las imágenes que sí tienen su label
 valid_images = [img for img in images if os.path.splitext(img)[0] in label_names]
 
-# Barajar aleatoriamente
+# Mezclar aleatoriamente
 random.shuffle(valid_images)
 
 # Calcular tamaños de splits
@@ -67,3 +67,4 @@ print("División completada:")
 print(f"  Train: {len(train_imgs)} imágenes")
 print(f"  Val:   {len(val_imgs)} imágenes")
 print(f"  Test:  {len(test_imgs)} imágenes")
+
