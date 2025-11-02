@@ -171,21 +171,24 @@ El script `p4.py` realiza todo el pipeline de detección y seguimiento.
 
   * Un vídeo procesado (`p4_output.mp4`)
   * Un CSV con todas las detecciones (`p4_results.csv`)
-  * 
+> Nota: Los IDs de clase corresponden a las categorías preentrenadas de YOLO basadas en COCO: persona, bicicleta, coche, moto, bus y camión.
+
 ---
 
 ### Formato del CSV generado
 
 Si detecta matrícula:
-| frame | tipo_objeto | confianza | track_id | x1  | y1  | x2  | y2  | plate_conf | mx1 | my1 | mx2 | my2 |
-| ----- | ----------- | --------- | -------- | --- | --- | --- | --- | ---------- | --- | --- | --- | --- |
-| 10    | car         | 0.89      | 2        | 120 | 310 | 280 | 420 | 0.93       | 140 | 360 | 250 | 400 |
+| frame | tipo_objeto | confianza | track_id | x1  | y1  | x2  | y2  | plate | plate_conf | mx1 | my1 | mx2 | my2 |
+| ----- | ----------- | --------- | -------- | --- | --- | --- | --- | ----- | ---------- | --- | --- | --- | --- |
+| 10    | car         | 0.89      | 2        | 120 | 310 | 280 | 420 | Si    | 0.93       | 140 | 360 | 250 | 400 |
 
 
 Si no detecta matrícula:
-| frame | tipo_objeto | confianza | track_id | x1  | y1  | x2  | y2  | plate_conf | mx1 | my1 | mx2 | my2 |
-| ----- | ----------- | --------- | -------- | --- | --- | --- | --- | ---------- | --- | --- | --- | --- |
-| 27    | car         | 0.78      | 5        | 56 | 234 | 134 | 346 | ,       | , | , | , | , |
+| frame | tipo_objeto | confianza | track_id | x1 | y1  | x2  | y2  | plate | plate_conf | mx1 | my1 | mx2 | my2 |
+| ----- | ----------- | --------- | -------- | -- | --- | --- | --- | ----- | ---------- | --- | --- | --- | --- |
+| 27    | person      | 0.78      | 5        | 56 | 234 | 134 | 346 | No    | ,          | ,   | ,   | ,   | ,   |
+
+- Genera un CSV con el **conteo de objetos únicos** (`p4_conteo_clases.csv`) para evitar contar varias veces el mismo vehículo o persona.
 
 ---
 
@@ -204,8 +207,8 @@ El flujo direccional no se calcula durante la inferencia, sino **a partir del CS
 3. Se registra el primer y último centro de cada `track_id`.
 4. Se determina la dirección del movimiento:
 
-   * ➡️ **derecha** si `cx_final > cx_inicial`
-   * ⬅️ **izquierda** si `cx_final < cx_inicial`
+   * ⬆️ **arriba** si `cy_final < cy_inicial`
+   * ⬇️ **abajo** si `cy_final > cy_inicial`
    * ⏹️ **estática** si no hay desplazamiento significativo
 5. Se genera un **CSV resumen final**: `p4_flujo.csv`
 
@@ -213,11 +216,9 @@ El flujo direccional no se calcula durante la inferencia, sino **a partir del CS
 
 ### Formato del CSV
 
-| track_id | tipo_objeto | confianza | flujo     |
-| -------- | ----------- | --------- | --------- |
-| 1        | car         | 0.91      | derecha   |
-| 2        | person      | 0.88      | izquierda |
-| 3        | bus         | 0.95      | estatica  |
+| frame | tipo_objeto | confianza | track_id | x1 | y1 | x2 | y2 | plate | plate_conf | mx1 | my1 | mx2 | my2 | flujo |
+| ----- | ----------- | --------- | -------- | -- | -- | -- | -- | ----- | ---------- | --- | --- | --- | --- | ----- |
+| 12    | car         | 0.91      | 1        | 138 | 220 | 248 | 345 | Si    | 0.87       | 145 | 230 | 240 | 340 | arriba |
 
 ---
 
