@@ -14,7 +14,7 @@ Este proyecto implementa un **sistema de detección y seguimiento de personas y 
 ## Estructura del Proyecto
 
 ```bash
-├── dataset/
+├── dataset/ # subido a onedrive
 │ ├── train/
 │ │ ├── images/
 │ │ └── labels/
@@ -103,7 +103,7 @@ Donde:
 
 ---
 
-### División del dataset (([Enlace al repositorio](https://drive.google.com/drive/folders/1FaHHGn4XlpjYOFe-2kCk8cHs3wnOyZk6)
+### División del dataset (Subido a Onedrive)
 
 Se disponía de 691 imágenes y se realizó una división aleatoria mediante el script `divide.py`:
 
@@ -158,14 +158,14 @@ yolo detect predict model=yolo_runs/plates_detection/weights/best.pt source="C01
 
 ## 3. Detección, Seguimiento y Anonimización
 
-El script `p4.py` realiza todo el pipeline de detección y seguimiento.
+El cuaderno `VC_P4.ipynb` realiza todo el pipeline de detección y seguimiento.
 
 ### Funcionalidades
 
 * Detecta **personas y vehículos** con el modelo general `yolo11n.pt`
 * Detecta **matrículas** con el modelo entrenado `best.pt`
 * Realiza **tracking persistente** para mantener el `track_id`
-* **Anonimiza** personas y matrículas con desenfoque (`cv2.GaussianBlur`)
+* **Anonimiza** personas y matrículas pixelando la región de interés (`cv2.INTER_LINEAR, cv2.INTER_NEAREST`)
 * Genera:
 
   * Un vídeo procesado (`p4_output.mp4`)
@@ -205,6 +205,7 @@ Cada entidad detectada mantiene un `track_id` único que permite conocer su tray
 
    ```python
    cy = (y1 + y2) // 2
+   cx = (x1 + x2) // 2
    ```
 
    Este punto representa la posición media del objeto en el frame.
@@ -258,7 +259,7 @@ Durante la ejecución, los conteos se muestran **frame a frame** superpuestos so
 > Nota: cy representa el centro vertical del objeto en el frame.
 > Como la cámara está fija y la escena principal tiene movimiento de personas y vehículos subiendo o bajando en la imagen, interesa el desplazamiento vertical, no horizontal.
 > Esto permite decir si un objeto “entra” desde abajo o “sale” hacia arriba del frame.
-> cx sería útil solo si se quisiera flujo horizontal (por ejemplo, tráfico de calles de lado).
+> Si se quisiera obtener el flujo horizontal, se haría con cx (por ejemplo, tráfico de carriles grabado de lado).
 
 ---
 
