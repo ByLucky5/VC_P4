@@ -270,8 +270,8 @@ Durante la ejecución, los conteos se muestran **frame a frame** superpuestos so
 
 ### Video procesado (Anonimización)
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=66cw3o4lElE" target="_blank">
-    <img src="https://img.youtube.com/vi/66cw3o4lElE/0.jpg" alt="Video anonimización" width="480">
+  <a href="https://www.youtube.com/watch?v=Zui_rLZOyuQ" target="_blank">
+    <img src="https://img.youtube.com/vi/Zui_rLZOyuQ/0.jpg" alt="Video anonimización" width="480">
   </a>
 </p>
 
